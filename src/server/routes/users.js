@@ -8,7 +8,7 @@ const nodemailer = require('nodemailer');
 
 //Login route
 router.get('/login', async (req, res) => {
-	//Get User Data
+	// Get User Data
 	const clientUser = req.body.user;
 	const dbUser = await User.findOne({ email: clientUser.email });
 
