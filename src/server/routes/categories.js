@@ -1,7 +1,6 @@
 const express = require('express');
 const Category = require('../models/Category');
 const router = express.Router();
-const Categories = require('../models/Category');
 
 router.get('/', async (req, res) => {
 	try {
@@ -22,7 +21,7 @@ router.post('/', async (req, res) => {
 		});
 	}
 
-	const categoryExists = await Categories.findOne({
+	const categoryExists = await Category.findOne({
 		categoryName: categoryName,
     });
     if (categoryExists) {
@@ -38,7 +37,7 @@ router.post('/', async (req, res) => {
 	const savedCategoryId = savedCategory._id;
 
 	if (parentCategoryName) {
-		const categoryParent = await Categories.findOne({
+		const categoryParent = await Category.findOne({
 			categoryName: parentCategoryName,
 		});
 		categoryParent.childCategories.push(savedCategoryId);
