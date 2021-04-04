@@ -20,7 +20,7 @@ router.get('/login', async (req, res) => {
 	//Compare Hashed Passwords
 	if (await bcrypt.compare(clientUser.password, dbUser.password)) {
 		jwt.sign(
-			{ email: clientUser.email, id: clientUser.id },
+			{ email: clientUser.email, id: dbUser.id },
 			'secretkey',
 			{ expiresIn: '2 days' },
 			(err, token) => {

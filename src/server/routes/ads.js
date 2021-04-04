@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Ad = require('../models/Ad');
 const jwt = require('jsonwebtoken');
+const jwt_decode = require('jwt-decode');
 const verifyToken = require('./users').verifyToken;
 
 //Create Ad

@@ -28,7 +28,6 @@ const AdSchema = mongoose.Schema(
 		},
 		valid: {
 			type: Boolean,
-			required: true,
 			default: true
 		}
 	},
