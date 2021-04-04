@@ -48,7 +48,7 @@ router.post('/update', verifyToken, async (req, res) => {
 
 		await ad.save();
 		res.status(200).json({
-			message: 'Ad created',
+			message: 'Ad updated',
 		});
 	});
 });
