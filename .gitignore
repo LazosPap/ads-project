@@ -1,2 +1,6 @@
 src/server/.env
 src/server/node_modules
+src/client/node_modules
+src/client/development
+src/client/.cache
+src/client/dist
