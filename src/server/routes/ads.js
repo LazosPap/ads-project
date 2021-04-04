@@ -6,5 +6,9 @@ const verifyToken = require('./users').verifyToken;
 const Category = require('../models/Category');
 
 
+//Get Data for One Ad
+router.get('/getOne', async (req, res) => {
+    
+})
 
 module.exports = router;
