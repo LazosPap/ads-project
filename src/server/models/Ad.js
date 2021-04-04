@@ -26,6 +26,11 @@ const AdSchema = mongoose.Schema(
 			type: Date,
 			default: Date.now,
 		},
+		valid: {
+			type: Boolean,
+			required: true,
+			default: true
+		}
 	},
 	{
 		versionKey: false,

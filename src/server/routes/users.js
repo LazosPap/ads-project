@@ -20,7 +20,7 @@ router.get('/login', async (req, res) => {
 	//Compare Hashed Passwords
 	if (await bcrypt.compare(clientUser.password, dbUser.password)) {
 		jwt.sign(
-			{ email: clientUser.email },
+			{ email: clientUser.email, id: clientUser.id },
 			'secretkey',
 			{ expiresIn: '2 days' },
 			(err, token) => {
@@ -125,7 +125,7 @@ router.post('/update', verifyToken, async (req, res) => {
 			const hashedPassword = await bcrypt.hash(newData.password, salt);
 			userObject.password = hashedPassword;
 		}
-		
+
 		await userObject.save();
 		res.status(200).json({
 			message: 'User updated',
