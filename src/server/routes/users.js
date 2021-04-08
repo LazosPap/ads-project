@@ -4,7 +4,13 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const jwt_decode = require('jwt-decode');
 const User = require('../models/User');
+const Ad = require('../models/Ad');
 const nodemailer = require('nodemailer');
+const multer = require('multer');
+const fs = require('fs');
+const { promisify } = require('util');
+const pipeline = promisify(require('stream').pipeline);
+const upload = multer();
 
 //Login route
 router.get('/login', async (req, res) => {
@@ -23,12 +29,14 @@ router.get('/login', async (req, res) => {
 			{ email: clientUser.email, id: dbUser.id },
 			'secretkey',
 			{ expiresIn: '2 days' },
-			(err, token) => {
+			async (err, token) => {
 				if (err) {
 					return res.status(400).json({
 						message: err,
 					});
 				}
+				dbUser.logins.push(Date.now());
+				await dbUser.save();
 				res.json({
 					message: 'User authenticated',
 					token,
@@ -41,10 +49,12 @@ router.get('/login', async (req, res) => {
 });
 
 //Register Route
-router.post('/register', async (req, res) => {
+router.post('/register', upload.single('profilePic'), async (req, res) => {
 	try {
 		//Check If User Exists
 		const userExists = await User.findOne({ email: req.body.email });
+		const { file } = req;
+
 		if (userExists) {
 			return res.status(401).json({
 				message: 'User with such email already exists!',
@@ -64,10 +74,14 @@ router.post('/register', async (req, res) => {
 			phoneNumber: req.body.phoneNumber,
 			email: req.body.email,
 			password: hashedPassword,
+			hasImage: file ? true : false,
 		});
 
-		//Save User to DB
-		const newUser = await user.save();
+		// Save User to DB
+		const newUser = await user.save(async (err, nu) => {
+			await uploadImage(file, nu._id);
+		});
+
 		await sendEmail(
 			req.body.email,
 			'Επιτυχής Εγγραφή',
@@ -75,12 +89,13 @@ router.post('/register', async (req, res) => {
 		);
 		res.json(newUser);
 	} catch (error) {
+		console.log(error);
 		res.json({ message: error });
 	}
 });
 
 //Remove User from DB
-router.delete('/delete', async (req, res) => {
+router.post('/delete', verifyToken, async (req, res) => {
 	const userEmail = req.body.email;
 	jwt.verify(req.token, 'secretkey', async (err, authData) => {
 		if (err) {
@@ -88,50 +103,65 @@ router.delete('/delete', async (req, res) => {
 				message: err,
 			});
 		}
+
 		const userToDelete = await User.deleteOne({ email: userEmail });
+		const userId = jwt_decode(req.token).id;
+
 		if (userToDelete) {
+			await Ad.deleteMany({ userId: userId });
 			res.status(200).json({
 				message: 'User removed from DB',
+				userToDelete,
 			});
 		} else {
 			res.status(500).json({
-				message: 'Something wen wrong',
+				message: 'Something went wrong',
 			});
 		}
 	});
 });
 
-router.post('/update', verifyToken, async (req, res) => {
-	const newData = req.body;
-	jwt.verify(req.token, 'secretkey', async (err, authData) => {
-		if (err) {
-			return res.status(403).json({
-				message: err,
-			});
-		}
-		const userEmail = jwt_decode(req.token).email;
-		const userObject = await User.findOne({ email: userEmail });
-
-		let passwordExists = false;
-		Object.keys(newData).forEach((property) => {
-			if (property == 'password') {
-				passwordExists = true;
+router.post(
+	'/update',
+	[verifyToken, upload.single('profilePic')],
+	async (req, res) => {
+		const newData = req.body;
+		jwt.verify(req.token, 'secretkey', async (err, authData) => {
+			if (err) {
+				return res.status(403).json({
+					message: err,
+				});
 			}
-			userObject[property] = newData[property];
-		});
+			const userEmail = jwt_decode(req.token).email;
+			const userObject = await User.findOne({ email: userEmail });
 
-		if (passwordExists) {
-			const salt = await bcrypt.genSalt();
-			const hashedPassword = await bcrypt.hash(newData.password, salt);
-			userObject.password = hashedPassword;
-		}
+			let passwordExists = false;
+			const imageExists = req.file ? true : false;
 
-		await userObject.save();
-		res.status(200).json({
-			message: 'User updated',
+			Object.keys(newData).forEach((property) => {
+				if (property == 'password') {
+					passwordExists = true;
+				}
+				userObject[property] = newData[property];
+			});
+
+			if (passwordExists) {
+				const salt = await bcrypt.genSalt();
+				const hashedPassword = await bcrypt.hash(newData.password, salt);
+				userObject.password = hashedPassword;
+			}
+
+			if (imageExists) {
+				await uploadImage(req.file, userObject.id);
+				userObject.hasImage = file ? true: userObject.hasImage;
+			}
+			await userObject.save();
+			res.status(200).json({
+				message: 'User updated',
+			});
 		});
-	});
-});
+	}
+);
 
 router.post('/resetPassword', async (req, res) => {
 	const userEmail = req.body.email;
@@ -205,6 +235,26 @@ function generatePassword() {
 		retVal += charset.charAt(Math.floor(Math.random() * n));
 	}
 	return retVal;
+}
+
+async function uploadImage(file, userId) {
+	try {
+		fs.unlinkSync(`${__dirname}/../public/userImages/${userId}.jpg`);
+		fs.unlinkSync(`${__dirname}/../public/userImages/${userId}.png`);
+		fs.unlinkSync(`${__dirname}/../public/userImages/${userId}.jpeg`);
+	} catch (e) {
+		console.log(e);
+	}
+
+	const extension = file.detectedFileExtension;
+	if (extension == '.png' || extension == '.jpg' || extension == '.jpeg') {
+		await pipeline(
+			file.stream,
+			fs.createWriteStream(
+				`${__dirname}/../public/userImages/${userId}${extension}`
+			)
+		);
+	}
 }
 
 module.exports = {

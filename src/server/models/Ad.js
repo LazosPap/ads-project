@@ -28,8 +28,13 @@ const AdSchema = mongoose.Schema(
 		},
 		valid: {
 			type: Boolean,
-			default: true
-		}
+			default: true,
+		},
+		images: [
+			{
+				type: String,
+			},
+		],
 	},
 	{
 		versionKey: false,

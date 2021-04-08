@@ -30,10 +30,18 @@ const UserSchema = mongoose.Schema(
 			type: String,
 			required: true,
 		},
+		logins: [
+			{
+				type: Date,
+			}
+		],
 		dateRegistered: {
 			type: Date,
 			default: Date.now,
 		},
+		hasImage: {
+			type: Boolean
+		}
 	},
 	{
 		versionKey: false,

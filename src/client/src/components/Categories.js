@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const Categories = async () => {
-    const res = await axios.get('localhost:3000/categories');
+    const res = await axios.get('http://localhost:3000/categories/getAll');
 
     console.log(res)
 }

@@ -2,9 +2,9 @@ const express = require('express');
 const Category = require('../models/Category');
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/getAll', async (req, res) => {
 	try {
-		const categories = await Categories.find();
+		const categories = await Category.find();
 		res.status(200).json(categories);
 	} catch (err) {
 		res.status(400).json({
@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
 	}
 });
 
-router.post('/', async (req, res) => {
+router.post('/create', async (req, res) => {
 	const {categoryName, parentCategoryName} = req.body.category;
 	if (!req.body.category) {
 		return res.status(500).json({
