@@ -102,25 +102,33 @@ router.get('/getOne', async (req, res) => {
 	}
 });
 
-//Get Data for All Ads
-router.get('/getAll', async (req, res) => {
+//Get Data for All Ads or By Category
+router.get('/getAds', async (req, res) => {
 	try {
-		const adData = await Ad.find();
-		res.status(200).json(adData);
-	} catch (err) {
-		res.status(400).json({
-			message: err,
-		});
-	}
-});
+		let query = Ad.find();
+		if (req.body.categoryId) {
+			query = Ad.find({ categoryId: req.body.categoryId });
+		}
 
-//Get Data for Ad In Specific Category
-router.get('/getByCategory', async (req, res) => {
-	try {
-		const adData = await Ad.find({ categoryId: req.body.categoryId });
-		res.status(200).json(adData);
+		const page = parseInt(req.query.page) || 1;
+		const pageSize = parseInt(req.query.limit) || 20;
+		const skip = (page - 1) * pageSize;
+		const total = await Ad.countDocuments();
+
+		const pages = Math.ceil(total / pageSize);
+
+		query = query.skip(skip).limit(pageSize);
+
+		const adData = await query;
+
+		res.status(200).json({
+			count: adData.length,
+			page,
+			pages,
+			data: adData,
+		});
 	} catch (err) {
-		res.status(400).json({
+		res.status(500).json({
 			message: err,
 		});
 	}
