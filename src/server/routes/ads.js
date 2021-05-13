@@ -1,53 +1,46 @@
 const express = require('express');
 const router = express.Router();
 const Ad = require('../models/Ad');
-const jwt = require('jsonwebtoken');
 const jwt_decode = require('jwt-decode');
-const { verifyToken } = require('./users');
-const mkdirp = require('mkdirp');
 const multer = require('multer');
 const upload = multer();
-const fs = require('fs');
-const { promisify } = require('util');
-const pipeline = promisify(require('stream').pipeline);
 const rimraf = require('rimraf');
+const Utilities = require('../Utilities/Utilities');
+const Authenticate = require('../Utilities/Authenticate');
 
 //Create Ad
 router.post(
 	'/create',
-	[verifyToken, upload.array('images', 5)],
+	[Authenticate.verifyToken, upload.array('images', 5)],
 	async (req, res) => {
-		jwt.verify(req.token, 'secretkey', async (err, authData) => {
-			if (err) {
-				return res.status(403).json({
-					message: err,
-				});
-			}
-
-			const images = await getImages(req.files);
-
-			const userId = jwt_decode(req.token).id;
-			const ad = new Ad({
-				userId: userId,
-				adType: req.body.adType,
-				description: req.body.description,
-				title: req.body.title,
-				categoryId: req.body.categoryId,
-				images: [],
+		if (!(await Authenticate.verifyUserToken(req.token))) {
+			return res.status(401).json({
+				message: 'Could not authenticate user',
 			});
+		}
+		const images = await Utilities.getImages(req.files);
 
-			for (image of images) {
-				ad.images.push(image.fileName);
-			}
+		const userId = jwt_decode(req.token).id;
+		const ad = new Ad({
+			userId: userId,
+			adType: req.body.adType,
+			description: req.body.description,
+			title: req.body.title,
+			categoryId: req.body.categoryId,
+			images: [],
+		});
 
-			const newAd = await ad.save(async (err, na) => {
-				await saveImages(images, na._id);
-			});
+		for (image of images) {
+			ad.images.push(image.fileName);
+		}
 
-			res.status(200).json({
-				message: 'Ad created',
-				newAd,
-			});
+		const newAd = await ad.save(async (err, na) => {
+			await Utilities.saveImages(images, na._id);
+		});
+
+		res.status(200).json({
+			message: 'Ad created',
+			newAd,
 		});
 	}
 );
@@ -55,37 +48,34 @@ router.post(
 //Update Ad
 router.post(
 	'/update',
-	[verifyToken, upload.array('images', 5)],
+	[Authenticate.verifyToken, upload.array('images', 5)],
 	async (req, res) => {
-		jwt.verify(req.token, 'secretkey', async (err, authData) => {
-			if (err) {
-				return res.status(403).json({
-					message: err,
-				});
-			}
-
-			const images = await getImages(req.files);
-
-			const ad = await Ad.findOne({ _id: req.body.adId });
-			ad.adType = req.body.adType;
-			ad.description = req.body.description;
-			ad.title = req.body.title;
-			ad.categoryId = req.body.categoryId;
-			ad.valid = req.body.valid;
-			ad.images = [];
-
-			for (image of images) {
-				ad.images.push(image.fileName);
-			}
-
-			await ad.save(async (err, na) => {
-				rimraf.sync(`${__dirname}/../public/adImages/${ad.id}/`);
-				await saveImages(images, na._id);
+		if (!(await Authenticate.verifyUserToken(req.token))) {
+			return res.status(401).json({
+				message: 'Could not authenticate user',
 			});
+		}
+		const images = await Utilities.getImages(req.files);
 
-			res.status(200).json({
-				message: 'Ad updated',
-			});
+		const ad = await Ad.findOne({ _id: req.body.adId });
+		ad.adType = req.body.adType;
+		ad.description = req.body.description;
+		ad.title = req.body.title;
+		ad.categoryId = req.body.categoryId;
+		ad.valid = req.body.valid;
+		ad.images = [];
+
+		for (image of images) {
+			ad.images.push(image.fileName);
+		}
+
+		await ad.save(async (err, na) => {
+			rimraf.sync(`${__dirname}/../public/adImages/${ad.id}/`);
+			await Utilities.saveImages(images, na._id);
+		});
+
+		res.status(200).json({
+			message: 'Ad updated',
 		});
 	}
 );
@@ -135,24 +125,22 @@ router.get('/getAds', async (req, res) => {
 });
 
 //Delete Ad
-router.delete('/deleteAd', verifyToken, async (req, res) => {
-	jwt.verify(req.token, 'secretkey', async (err, authData) => {
-		if (err) {
-			return res.status(403).json({
-				message: err,
-			});
-		}
-		try {
-			await Ad.deleteOne({ id: req.body.adId });
-			res.status(200).json({
-				message: 'Ad deleted',
-			});
-		} catch (err) {
-			res.status(400).json({
-				message: err,
-			});
-		}
-	});
+router.delete('/deleteAd', Authenticate.verifyToken, async (req, res) => {
+	if (!(await Authenticate.verifyUserToken(req.token))) {
+		return res.status(401).json({
+			message: 'Could not authenticate user',
+		});
+	}
+	try {
+		await Ad.deleteOne({ id: req.body.adId });
+		res.status(200).json({
+			message: 'Ad deleted',
+		});
+	} catch (err) {
+		res.status(400).json({
+			message: err,
+		});
+	}
 });
 
 router.get('/search', (req, res) => {
@@ -215,31 +203,5 @@ router.get('/search', (req, res) => {
 			res.status(500).json({ err });
 		});
 });
-
-async function getImages(files) {
-	const images = new Array();
-
-	for (image of files) {
-		const imageObject = {
-			fileName: image.originalName,
-			stream: image.stream,
-		};
-		images.push(imageObject);
-	}
-
-	return images;
-}
-
-async function saveImages(images, adId) {
-	for (image of images) {
-		mkdirp.sync(`${__dirname}/../public/adImages/${adId}/`);
-		await pipeline(
-			image.stream,
-			fs.createWriteStream(
-				`${__dirname}/../public/adImages/${adId}/${image.fileName}`
-			)
-		);
-	}
-}
 
 module.exports = router;
