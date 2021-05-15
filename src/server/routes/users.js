@@ -10,16 +10,23 @@ const Authenticate = require('../Utilities/Authenticate');
 const Utilities = require('../Utilities/Utilities');
 
 //Login route
-router.get('/login', async (req, res) => {
+router.post('/login', async (req, res) => {
 	if (!(await Authenticate.verifyUser(req.body))) {
-		return res.status(401).json({
+		return res.status(400).json({
 			message: 'Could not authenticate user',
 		});
 	}
-	const token = jwt.sign({ email: req.body.email }, process.env.PRIVATE_KEY);
+	const user = await User.findOne({ email: req.body.email });
+	user.logins.push(Date.now());
+	await user.save();
+	const token = jwt.sign(
+		{ email: req.body.email, id: user._id },
+		process.env.PRIVATE_KEY
+	);
 	res.status(200).json({
 		message: 'User authenticated',
 		token,
+		userID: user._id,
 	});
 });
 
@@ -36,14 +43,21 @@ router.post('/register', upload.single('profilePic'), async (req, res) => {
 		const { file } = req;
 
 		//Create User Object
-		const user = createUser(req.body, file ? true : false);
+		const user = await createUser(req.body, file ? true : false);
 
 		// Save User to DB
 		const newUser = await user.save(async (err, nu) => {
-			await Utilities.uploadImage(file, nu._id);
+			if (err) {
+				return res.status(500).json({
+					error: err,
+				});
+			}
+			if (file) {
+				await Utilities.uploadImage(file, nu._id);
+			}
 		});
 
-		await sendEmail(req.body.email, 'register', undefined);
+		await Utilities.sendEmail(req.body.email, 'register', undefined);
 		res.status(200).json(newUser);
 	} catch (error) {
 		console.log(error);
@@ -115,7 +129,7 @@ router.post(
 
 router.post('/resetPassword', async (req, res) => {
 	const userEmail = req.body.email;
-	const password = generatePassword();
+	const password = Authenticate.generatePassword();
 	const hashedPassword = await Authenticate.hashPassword(password);
 	const user = await User.findOne({ email: userEmail });
 	if (!user) {
@@ -127,20 +141,33 @@ router.post('/resetPassword', async (req, res) => {
 	user.password = hashedPassword;
 	await user.save();
 
-	await sendEmail(userEmail, 'reset', password);
+	await Utilities.sendEmail(userEmail, 'reset', password);
 
 	res.status(200).json({
 		message: 'Email sent to user with Email: ' + userEmail,
 	});
 });
 
+router.post('/getUserData', async (req, res) => {
+	const user = await User.findOne({ _id: req.body.userId });
+	res.status(200).json({
+		message: 'User authenticated',
+		userData: {
+			phoneNumber: user.phoneNumber,
+			fullName: user.firstName + ' ' + user.lastName,
+			postalCode: user.postalCode,
+			address: user.address,
+		},
+	});
+});
+
 async function createUser(user, hasFile) {
 	return new User({
-		firstName: user.firstName,
-		lastName: user.lastName,
-		address: user.address,
-		postalCode: user.postalCode,
-		phoneNumber: user.phoneNumber,
+		firstName: user.firstName || undefined,
+		lastName: user.lastName || undefined,
+		address: user.address || undefined,
+		postalCode: user.postalCode || undefined,
+		phoneNumber: user.phoneNumber || undefined,
 		email: user.email,
 		password: await Authenticate.hashPassword(user.password),
 		hasImage: hasFile,

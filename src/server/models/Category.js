@@ -3,14 +3,11 @@ const mongoose = require('mongoose');
 const CategorySchema = mongoose.Schema(
 	{
 		categoryName: {
-			type: String,
-			required: true,
+			type: String
 		},
-		childCategories: [
-			{
-				type: mongoose.ObjectId,
-			},
-		],
+		parent: {
+			type: String,
+		}
 	},
 	{
 		versionKey: false,

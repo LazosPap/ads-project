@@ -21,23 +21,38 @@ router.post(
 		const images = await Utilities.getImages(req.files);
 
 		const userId = jwt_decode(req.token).id;
-		const ad = new Ad({
-			userId: userId,
-			adType: req.body.adType,
-			description: req.body.description,
-			title: req.body.title,
-			categoryId: req.body.categoryId,
-			images: [],
-		});
+		let newAd;
+		try {
+			const ad = new Ad({
+				userId: userId,
+				adType: req.body.adType,
+				description: req.body.description,
+				title: req.body.title,
+				categoryId: req.body.categoryId,
+				price: req.body.price,
+				images: [],
+			});
 
-		for (image of images) {
-			ad.images.push(image.fileName);
+			for (image of images) {
+				ad.images.push(image.fileName);
+			}
+
+			newAd = await ad.save(async (err, na) => {
+				if (err) {
+					console.log(err);
+					return res.status(500).json({
+						error: err,
+					});
+				}
+				if (images) {
+					await Utilities.saveImages(images, na._id);
+				}
+			});
+		} catch (err) {
+			return res.status(500).json({
+				error: err,
+			});
 		}
-
-		const newAd = await ad.save(async (err, na) => {
-			await Utilities.saveImages(images, na._id);
-		});
-
 		res.status(200).json({
 			message: 'Ad created',
 			newAd,
@@ -63,6 +78,7 @@ router.post(
 		ad.title = req.body.title;
 		ad.categoryId = req.body.categoryId;
 		ad.valid = req.body.valid;
+		ad.price = req.body.price;
 		ad.images = [];
 
 		for (image of images) {
@@ -81,10 +97,10 @@ router.post(
 );
 
 //Get Data for One Ad
-router.get('/getOne', async (req, res) => {
+router.post('/getOne', async (req, res) => {
 	try {
-		const adData = await Ad.findOne({ id: req.body.adId });
-		res.status(200).json(adData);
+		const adData = await Ad.findOne({ _id: req.body.adId });
+		res.status(200).json({ adData });
 	} catch (err) {
 		res.status(400).json({
 			message: err,
@@ -93,7 +109,7 @@ router.get('/getOne', async (req, res) => {
 });
 
 //Get Data for All Ads or By Category
-router.get('/getAds', async (req, res) => {
+router.post('/getAds', async (req, res) => {
 	try {
 		let query = Ad.find();
 		if (req.body.categoryId) {
@@ -143,7 +159,7 @@ router.delete('/deleteAd', Authenticate.verifyToken, async (req, res) => {
 	}
 });
 
-router.get('/search', (req, res) => {
+router.post('/search', (req, res) => {
 	const { pattern } = req.body;
 	Ad.aggregate([
 		{
@@ -188,6 +204,7 @@ router.get('/search', (req, res) => {
 				categoryId: 1,
 				dateRegistered: 1,
 				valid: 1,
+				price: 1,
 				score: {
 					$meta: 'searchScore',
 				},

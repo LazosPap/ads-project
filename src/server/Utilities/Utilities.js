@@ -3,6 +3,7 @@ const { promisify } = require('util');
 const nodemailer = require('nodemailer');
 const pipeline = promisify(require('stream').pipeline);
 const EmailTemplates = require('./EmailTemplates');
+const mkdirp = require('mkdirp');
 
 async function sendEmail(recipientEmail, emailCase, newPassword) {
 	const transporter = nodemailer.createTransport({
@@ -21,16 +22,16 @@ async function sendEmail(recipientEmail, emailCase, newPassword) {
 	switch (emailCase) {
 		case 'reset':
 			subject = 'Επαναφορά κωδικού πρόσβασης';
-			html = EmailTemplates.resetPasswordBody(newPassword);
+			html = EmailTemplates.resetPasswordBody(newPassword).html;
 			break;
 		case 'register':
 			subject = 'Εγγραφή στην ηλεκτρονική σελίδα MotherTech';
-			html = EmailTemplates.registerUserBody();
+			html = EmailTemplates.registerUserBody().html;
 			break;
 	}
 
 	await transporter.sendMail({
-		from: '"Adopse Ads 🔑" <adopse_ads@yahoo.com>',
+		from: '"MotherTech 🔑" <adopse_ads@yahoo.com>',
 		to: recipientEmail,
 		subject: subject,
 		html: EmailTemplates.emailTemplate(subject, html),
@@ -43,7 +44,7 @@ async function uploadImage(file, userId) {
 		fs.unlinkSync(`${__dirname}/../public/userImages/${userId}.png`);
 		fs.unlinkSync(`${__dirname}/../public/userImages/${userId}.jpeg`);
 	} catch (e) {
-		console.log(e);
+		// console.log(e);
 	}
 
 	const extension = file.detectedFileExtension;

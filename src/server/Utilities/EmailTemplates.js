@@ -1,5 +1,5 @@
 function emailTemplate(subject, body) {
-	`<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -37,9 +37,10 @@ function emailTemplate(subject, body) {
             background-color: #3f3f3f;
             margin: 0 auto;
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             border-spacing: 0;
             color: #4a4a4a;
+            padding: 50px;
         }
         .two-columns{
             text-align: left;
@@ -74,9 +75,6 @@ function emailTemplate(subject, body) {
         margin: 4px 2px;
         cursor: pointer;
         }
-        @media screen and (max-width: 600px) { 
-    
-        }
     </style>
     </head>
     <body>
@@ -84,13 +82,12 @@ function emailTemplate(subject, body) {
         <center class="wrapper">
     
             <table class="main" width="100%">
-    
-    <!-- SOCIAL MEDIA ICONS -->
+
                 <tr>
                     <td>
                         <table width="100%">
                             
-                            <a href="#"><img src="https://drive.google.com/file/d/1U7i-1fE85k4tD6oWB2v93kvRmKCqLIsr/view?usp=sharing"></a>
+                            <a href="http://localhost:4000/"><img src="https://www.freepngdesign.com/content/uploads/images/t_p40-5-dogecoin-5754911498.png" style="width:100px"></a>
     
                             <td style="text-align: center;" >
                                 <p style="font-size: 24px;">${subject}</p>
@@ -99,21 +96,6 @@ function emailTemplate(subject, body) {
                         </table>
                     </td>
                 </tr>
-    
-    <!-- LOGO SECTION -->
-    
-    
-    <!-- GIF BANNER IMAGE -->
-    
-    
-    <!-- TITLE, TEXT & BUTTON -->
-    
-    
-    <!-- BLUE BORDER -->
-    
-    
-    <!-- TWO COLUMN SECTION -->
-    
                 <tr>
                     <td>
                         <table width="100%">
@@ -128,7 +110,7 @@ function emailTemplate(subject, body) {
                                                 <table class="content">
                                                     <tr>
                                                         <td>
-                                                            <a href="#"><img src="https://drive.google.com/file/d/1flDFLcevgqw-RHylxd0I-HKYcsMJwEr-/view?usp=sharing"
+                                                            <a><img src="https://www.ccn.com/wp-content/uploads/2019/09/iPhone-11-techSpot-720x435.jpg"
                                                                 alt="" width="260px" style="max-width: 260px; border-radius: 20px;"></a>
                                                         
                                                         </td>
@@ -160,8 +142,6 @@ function emailTemplate(subject, body) {
                         </table>
                     </td>
                 </tr>
-    
-    <!-- BLUE BACKGROUND QUOTE -->
                 <tr>
                     <td>
                         <table class="last" width="100%">
@@ -171,15 +151,14 @@ function emailTemplate(subject, body) {
                                     <p>Επισκεφτείτε την ιστοσελίδα 
                                         μας πατώντας στον παρακάτω σύνδεσμο</p>
                                     <p>Με εκτίμηση, η ομάδα του Mother Tech.</p>
-                                    <a href="http://localhost:3000/"><button style="border-radius: 10px;" class="button">Visit Us</button></a>
+                                    <a href="http://localhost:4000/"><button style="border-radius: 10px;" class="button">Visit Us</button></a>
                                 </td>
                             </tr>
     
                         </table>
                     </td>
                 </tr>
-    
-    <!-- FOOTER SECTION -->
+
             </table>
     
         </center>
@@ -192,9 +171,9 @@ function resetPasswordBody(newPassword) {
 	return {
 		subject: 'Επαναφορά κωδικού πρόσβασης',
 		html: `Ο νέος κωδικός πρόσβασής σας είναι:
-
+        <br>
         <b>${newPassword}</b>
-        
+        <br>
         Μπορείτε να τον αλλάξετε από την σελίδα των επιλογών σας`,
 	};
 }

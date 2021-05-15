@@ -35,6 +35,9 @@ const AdSchema = mongoose.Schema(
 				type: String,
 			},
 		],
+		price: {
+			type: String
+		}
 	},
 	{
 		versionKey: false,

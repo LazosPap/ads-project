@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="shortcut icon" href="/static/images/Mother Tech Logo.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" />
+    <title>Mother Tech</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.js" integrity="sha512-otOZr2EcknK9a5aa3BbMR9XOjYKtxxscwyRHN6zmdXuRfJ5uApkHB7cz1laWk2g8RKLzV9qv/fl3RPwfCuoxHQ==" crossorigin="anonymous"></script>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <a href="/" data-link><img src="/static/images/Mother Tech Logo.png"></a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/" data-link>Αρχική</a></li>
+            <li>
+            <a href="#">Προϊόντα</a>
+            <div class="mega-box">
+                <div class="content">
+                    <div class="row">
+                        <header>ΗΛΕΚΤΡΟΝΙΚΟΙ ΥΠΟΛΟΓΙΣΤΕΣ</header>
+                        <ul class="mega-links">
+                            <li><a href="#">Μητρικές</a>
+                            <li><a href="/categories/609fe5a84f2d68f944c3a150">Κάρτες Γραφικών</a>
+                            <li><a href="#">Τροφοδοτικά</a>
+                            <li><a href="#">RAM</a>
+                            <li><a href="#">Ψύχτρες</a>
+                            <li><a href="#">Σκληροί Δίσκοι</a>
+                            <li><a href="#">Διάφορα Καλώδια</a>
+                        </ul>
+                    </div>
+                    <div class="row">
+                        <header>ΗΧΟΣ</header>
+                        <ul class="mega-links">
+                            <li><a href="#">Ηχεία</a>
+                            <li><a href="#">Ακουστικά</a>
+                            <li><a href="#">Μουσικός Εξοπλισμός</a>
+                            <li><a href="#">Αξεσουάρ Ήχου</a>
+                        </ul>
+                        <div class="row">
+                            <header>LAPTOPS</header>
+                            <ul class="mega-links">
+                                <li><a href="#">Laptops</a>
+                                <li><a href="#">Αξεσουάρ</a>
+                                <li><a href="#">Φορτιστές</a>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <header>ΕΙΚΟΝΑ</header>
+                        <ul class="mega-links">
+                            <li><a href="#">Monitors</a>
+                            <li><a href="#">Τηλεοράσεις</a>
+                            <li><a href="#">Αξεσουαρ Τηλεοράσης</a>
+                        </ul>
+                        <div class="row">
+                            <header>ΚΙΝΗΤΑ</header>
+                            <ul class="mega-links">
+    
+                                <li><a href="#">Θήκες</a>
+                                <li><a href="#">Φορτιστές</a>
+                                <li><a href="#">Αξεσουάρ</a>
+                            </ul>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <header>GADGETS</header>
+                        <ul class="mega-links">
+
+                            <li><a href="#">Wearables</a>
+                            <li><a href="#">Tablets</a>
+                            <li><a href="#">Αξεσουάρ</a>
+                        </ul>
+                        <div class="row">
+                            <header>ΠΕΡΙΦΕΡΕΙΑΚΑ</header>
+                            <ul class="mega-links">
+    
+                                <li><a href="#">Ποντίκια</a>
+                                <li><a href="#">Πληκτρολόγια</a>
+                                <li><a href="#">Mouse Pads</a>
+                                <li><a href="#">Εκτυπωτές</a>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <header>ΦΩΤΟΓΡΑΦΙΑ & ΒΙΝΤΕΟ</header>
+                        <ul class="mega-links">
+                            <li><a href="#">Φωτογραφικές Μηχανές</a>
+                            <li><a href="#">Βιντεοκάμερες</a>
+                            <li><a href="#">Αξεσουάρ</a>
+                        </ul>
+                    </div>
+                </div>
+                <li id="createAdButton"><a href="/createad" data-link style="text-align:center;">Προσθήκη Αγγελίας</a></li>
+            </div>
+
+            </li>
+            <li><a href="/signinregister" id="userAvatar" data-link><img class="avatar-img" id="avatar-img" src="/static/images/avatar.png"></a>
+            <ul class="dropmenu" id="dropmenu">
+                <li><a href="/" data-link id="logout">Αποσύνδεση</a></li>
+                <li><a href="/user" data-link>Ρυθμίσεις</a></li>
+            </ul>
+        </li>
+        </ul>
+        <div class="burger">
+            <div class="line1"></div>
+            <div class="line2"></div>
+            <div class="line3"></div>
+        </div>
+    </nav>
+
+    <div id="app"></div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="image-footer">
+                <a href="#"><img src="/static/images/Mother Tech Logo.png"></a>
+            </div>
+            <p>Καλωσήλθατε στην ιστοσελίδας μας</p>
+            <ul class="socials">
+                <li><a href="#"><i class="fab fa-facebook"></i></a></li>
+                <li><a href="#"><i class="fab fa-youtube"></i></a></li>
+                <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+            </ul>
+        </div>
+        <div class="footer-bottom">
+            <p>Copyright &copy; 2021 MotherTech. Designed by MotherTech</p>
+        </div>
+    </footer>
+    <script type="module" src="/static/js/index.js"></script>
+    <script type="module" src="/static/js/Utilities/CheckState.js"></script>
+    <script type="module" src="/static/js/Utilities/nav.js"></script>
+</body>
+</html>

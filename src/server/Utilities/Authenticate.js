@@ -32,6 +32,9 @@ async function userExists(email) {
 
 async function verifyUser(user) {
 	const userDB = await User.findOne({ email: user.email });
+	if (!userDB) {
+		return false;
+	}
 	const authenticated = await authenticatePassword(
 		user.password,
 		userDB.password
