@@ -317,10 +317,12 @@ nav {
     overflow-y: hidden;
 }
 .product-card img {
-    max-width: 272px;
-    max-height: 290px;
-    display: block;
-    cursor: pointer;
+  max-width: 272px;
+  min-width: 272px;
+  max-height: 290px;
+  min-height: 290px;
+  display: block;
+  cursor: pointer;
 }
 
 .card-content {

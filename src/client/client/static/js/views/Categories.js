@@ -57,7 +57,6 @@ async function getAds(categoryId) {
     const response = await axios.post("http://localhost:3000/ads/getAds", {
         categoryId: categoryId
     })
-    console.log(response.data.data)
     return renderAds(response.data.data,null);
 }
 

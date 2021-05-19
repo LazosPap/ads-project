@@ -1,5 +1,3 @@
-import navigateTo from '../index.js';
-
 const title = document.getElementById('adTitleForm');
 const description = document.getElementById('descriptionForm');
 const adType = document.getElementById('ad_type');

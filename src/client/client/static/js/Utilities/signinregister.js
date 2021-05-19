@@ -21,7 +21,7 @@ document.getElementById('login').addEventListener('click', async (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
-    await login(email, password);
+	await login(email, password);
 });
 
 document.getElementById('register-btn').addEventListener('click', async (e) => {
@@ -50,9 +50,8 @@ document.getElementById('register-btn').addEventListener('click', async (e) => {
 			'Content-Type': 'multipart/form-data',
 		},
 	});
-	console.log(response);
 	if (response.statusCode === 400) {
-		alert("Το email ή ο κωδικός πρόσβασης είναι λάθος")
+		alert("Κάτι πήγε στραβά")
 	}
     if (response.status === 200) {
 		await login(document.getElementsByName('email')[0].value, document.getElementsByName('pass1')[0].value);

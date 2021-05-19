@@ -3,7 +3,7 @@ import AbstractView from './AbstractView.js';
 export default class extends AbstractView {
 	constructor(params) {
 		super(params);
-		this.setTitle('Δημιουργία Αγγελίας');
+		this.setTitle('Η σελίδα δεν βρέθηκε!');
 	}
 
 	async getHtml() {
