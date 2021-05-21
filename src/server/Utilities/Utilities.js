@@ -44,7 +44,7 @@ async function uploadImage(file, userId) {
 		fs.unlinkSync(`${__dirname}/../public/userImages/${userId}.png`);
 		fs.unlinkSync(`${__dirname}/../public/userImages/${userId}.jpeg`);
 	} catch (e) {
-		// console.log(e);
+		console.log(e);
 	}
 
 	const extension = file.detectedFileExtension;

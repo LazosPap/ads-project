@@ -12,17 +12,14 @@ async function authenticatePassword(password, hashedPassword) {
 }
 
 function verifyToken(req, res, next) {
-	//Get Auth Header
 	const bearerHeader = req.headers['authorization'];
 	if (typeof bearerHeader == 'undefined') {
 		return res.status(403);
 	}
-	//Get Bearer Token
 	const bearerToken = bearerHeader.replace('Bearer', '').trim();
 
-	//Set Token
 	req.token = bearerToken;
-	//Continue to Route
+
 	next();
 }
 
