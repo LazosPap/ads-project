@@ -14,7 +14,7 @@ router.get('/getAll', async (req, res) => {
 });
 
 router.post('/create', async (req, res) => {
-	const {categoryName, parentCategoryName} = req.body.category;
+	const {categoryName, parentCategory} = req.body.category;
 	if (!req.body.category) {
 		return res.status(500).json({
 			message: 'Categories object is empty',
@@ -32,21 +32,15 @@ router.post('/create', async (req, res) => {
 
 	const newCategory = new Category({
 		categoryName: categoryName,
+		parent: parentCategory
 	});
 	const savedCategory = await newCategory.save();
 	const savedCategoryId = savedCategory._id;
 
-	if (parentCategoryName) {
-		const categoryParent = await Category.findOne({
-			categoryName: parentCategoryName,
-		});
-		categoryParent.childCategories.push(savedCategoryId);
-		await categoryParent.save();
-	}
-
 	return res.status(200).json({
 		message: 'Category saved',
-		savedCategory
+		savedCategory,
+		savedCategoryId
 	});
 });
 
